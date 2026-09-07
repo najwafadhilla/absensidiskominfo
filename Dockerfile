@@ -52,7 +52,7 @@ RUN composer install \
     --no-scripts
 
 
-FROM php:8.2-apache
+FROM php:8.2-cli
 
 WORKDIR /var/www/html
 
@@ -77,9 +77,6 @@ RUN apt-get update && apt-get install -y \
         pcntl \
         gd \
         zip \
-    && rm -f /etc/apache2/mods-enabled/mpm_*.load \
-    && rm -f /etc/apache2/mods-enabled/mpm_*.conf \
-    && a2enmod mpm_prefork rewrite \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -89,30 +86,10 @@ COPY . .
 
 COPY --from=frontend /app/public/build ./public/build
 
-RUN sed -ri 's!/var/www/html!/var/www/html/public!g' \
-    /etc/apache2/sites-available/000-default.conf
-
-RUN cat > /usr/local/bin/start-apache <<'EOF'
-#!/bin/bash
-set -e
-
-PORT="${PORT:-10000}"
-
-sed -ri "s/^[[:space:]]*Listen [0-9]+/Listen ${PORT}/" \
-    /etc/apache2/ports.conf
-
-sed -ri "s/<VirtualHost \*:[0-9]+>/<VirtualHost *:${PORT}>/" \
-    /etc/apache2/sites-available/000-default.conf
-
-exec apache2-foreground
-EOF
-
-RUN chmod +x /usr/local/bin/start-apache
-
 RUN chown -R www-data:www-data \
     storage \
     bootstrap/cache
 
-EXPOSE 10000
+EXPOSE 8080
 
-CMD ["/usr/local/bin/start-apache"]
+CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"]
