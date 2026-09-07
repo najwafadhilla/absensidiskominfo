@@ -2,8 +2,8 @@ FROM node:20-bookworm AS frontend
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-RUN npm ci
+COPY package.json ./
+RUN npm install
 
 COPY resources ./resources
 COPY public ./public
