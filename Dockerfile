@@ -2,9 +2,8 @@ FROM node:20-bookworm AS frontend
 
 WORKDIR /app
 
-COPY package.json ./
-
-RUN npm install
+COPY package.json package-lock.json ./
+RUN npm ci
 
 COPY resources ./resources
 COPY public ./public
@@ -78,7 +77,8 @@ RUN apt-get update && apt-get install -y \
         pcntl \
         gd \
         zip \
-    && a2enmod rewrite \
+    && a2dismod mpm_event mpm_worker mpm_prefork || true \
+    && a2enmod mpm_prefork rewrite \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -91,11 +91,22 @@ COPY --from=frontend /app/public/build ./public/build
 RUN sed -ri 's!/var/www/html!/var/www/html/public!g' \
     /etc/apache2/sites-available/000-default.conf
 
-RUN sed -ri 's!Listen 80!Listen 10000!g' \
+RUN cat > /usr/local/bin/start-apache <<'EOF'
+#!/bin/bash
+set -e
+
+PORT="${PORT:-10000}"
+
+sed -ri "s/^[[:space:]]*Listen [0-9]+/Listen ${PORT}/" \
     /etc/apache2/ports.conf
 
-RUN sed -ri 's!<VirtualHost \*:80>!<VirtualHost *:10000>!g' \
+sed -ri "s/<VirtualHost \*:[0-9]+>/<VirtualHost *:${PORT}>/" \
     /etc/apache2/sites-available/000-default.conf
+
+exec apache2-foreground
+EOF
+
+RUN chmod +x /usr/local/bin/start-apache
 
 RUN chown -R www-data:www-data \
     storage \
@@ -103,4 +114,4 @@ RUN chown -R www-data:www-data \
 
 EXPOSE 10000
 
-CMD ["apache2-foreground"]
+CMD ["/usr/local/bin/start-apache"]
