@@ -27,7 +27,8 @@ class Kunjungan extends Model
         'tujuan_bidang',
         'bertemu_dengan',
         'jabatan',
-'catatan'
+'catatan',
+'foto'
 
     ];
 

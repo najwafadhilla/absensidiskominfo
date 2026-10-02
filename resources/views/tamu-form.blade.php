@@ -300,8 +300,9 @@ Kode keamanan salah
 
 
 
-<form action="/tamu/simpan" method="POST">
-
+<form action="/tamu/simpan"
+method="POST"
+enctype="multipart/form-data">
 
 @csrf
 
@@ -650,12 +651,47 @@ rows="4">
 
 
 </div>
+<!-- FOTO -->
+
+<div class="mb-3">
+
+<label class="label">
+Dokumentasi Kegiatan
+</label>
 
 
+<input
+
+type="file"
+
+name="foto"
+
+id="foto"
+
+class="form-control"
+
+accept="image/*"
+onchange="previewFoto(event)">
 
 
+<img
+id="preview"
+style="
+display:none;
+margin-top:15px;
+width:120px;
+height:120px;
+object-fit:cover;
+border-radius:15px;
+">
 
 
+<small class="text-muted">
+Format JPG, PNG maksimal 2MB
+</small>
+
+
+</div>
 
 <!-- CAPTCHA -->
 
@@ -766,6 +802,15 @@ waktu();
 
 setInterval(waktu,1000);
 
+function previewFoto(event){
+
+    let image = document.getElementById('preview');
+
+    image.src = URL.createObjectURL(event.target.files[0]);
+
+    image.style.display = "block";
+
+}
 
 
 </script>

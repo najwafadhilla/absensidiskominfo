@@ -7,28 +7,21 @@
 <div class="container-fluid">
 
 
-
-<!-- ================= HEADER ================= -->
-
+<!-- HEADER -->
 
 <div class="page-header">
 
-
 <div>
-
 
 <h2>
 Data Tamu
 </h2>
 
-
 <p>
 Daftar seluruh kunjungan tamu
 </p>
 
-
 </div>
-
 
 
 <a href="/tamu" class="btn btn-primary">
@@ -46,8 +39,7 @@ Halaman Pengunjung
 
 
 
-<!-- ================= FILTER ================= -->
-
+<!-- FILTER -->
 
 <div class="card-box mt-4">
 
@@ -58,9 +50,7 @@ Halaman Pengunjung
 <div class="row g-3">
 
 
-
 <div class="col-md-6">
-
 
 <label>
 Pencarian
@@ -78,14 +68,12 @@ placeholder="Cari nama, instansi, keperluan..."
 value="{{request('search')}}">
 
 
-
 </div>
 
 
 
 
 <div class="col-md-3">
-
 
 <label>
 Tanggal
@@ -129,7 +117,6 @@ Cari
 </div>
 
 
-
 </form>
 
 
@@ -140,11 +127,13 @@ Cari
 
 
 
-<!-- ================= TABLE ================= -->
+
+
+
+<!-- TABLE -->
 
 
 <div class="card-box mt-4">
-
 
 
 <div class="table-responsive laporan-table">
@@ -160,31 +149,74 @@ Cari
 <tr>
 
 
-<th>No</th>
+<th>
+No
+</th>
 
-<th>Nama Lengkap</th>
 
-<th>Instansi</th>
+<th>
+Nama Lengkap
+</th>
 
-<th>Jabatan</th>
 
-<th>Status</th>
+<th>
+Instansi
+</th>
 
-<th>No HP</th>
 
-<th>Keperluan</th>
+<th>
+Jabatan
+</th>
 
-<th>Tujuan Bidang</th>
 
-<th>Bertemu Dengan</th>
+<th>
+Status
+</th>
 
-<th>Catatan</th>
 
-<th>Tanggal</th>
+<th>
+No HP
+</th>
 
-<th>Jam</th>
 
-<th>Aksi</th>
+<th>
+Keperluan
+</th>
+
+
+<th>
+Tujuan Bidang
+</th>
+
+
+<th>
+Bertemu Dengan
+</th>
+
+
+<th>
+Catatan
+</th>
+
+
+<th>
+Dokumentasi
+</th>
+
+
+<th>
+Tanggal
+</th>
+
+
+<th>
+Jam
+</th>
+
+
+<th>
+Aksi
+</th>
 
 
 </tr>
@@ -198,18 +230,26 @@ Cari
 
 <tbody>
 
+
 @forelse($kunjungans as $index=>$data)
+
+
 
 <tr>
 
+
+
 <td>
+
 {{$index+1}}
+
 </td>
 
 
 
-<td>
 
+
+<td>
 
 <b>
 
@@ -223,11 +263,13 @@ Cari
 
 
 
+
 <td>
 
-{{$data->instansi_asal}}
+{{$data->instansi_asal ?? '-'}}
 
 </td>
+
 
 
 
@@ -241,19 +283,19 @@ Cari
 
 
 
+
 <td>
 
 
 <span class="badge-status">
 
-
 {{$data->status ?? 'Umum'}}
-
 
 </span>
 
 
 </td>
+
 
 
 
@@ -267,11 +309,13 @@ Cari
 
 
 
+
 <td>
 
 {{$data->keperluan}}
 
 </td>
+
 
 
 
@@ -285,15 +329,12 @@ Cari
 
 
 
+
 <td>
 
 {{$data->bertemu_dengan ?? '-'}}
 
 </td>
-
-
-
-
 <td>
 
 @if($data->catatan)
@@ -308,12 +349,59 @@ Cari
 
 @else
 
+
 -
 
 @endif
 
 
 </td>
+
+
+
+
+
+
+
+<!-- DOKUMENTASI KEGIATAN -->
+
+
+<td>
+
+
+@if($data->foto)
+
+
+<img
+
+src="{{asset('storage/'.$data->foto)}}"
+
+onclick="lihatFoto('{{asset('storage/'.$data->foto)}}')"
+
+class="foto-kegiatan"
+
+
+>
+
+
+@else
+
+
+<span class="text-muted">
+
+Tidak ada foto
+
+</span>
+
+
+@endif
+
+
+
+</td>
+
+
+
 
 
 
@@ -329,16 +417,25 @@ Cari
 
 
 
+
+
+
 <td>
 
+
 {{$data->jam_kedatangan}}
+
 
 </td>
 
 
 
 
+
+
+
 <td>
+
 
 
 <a href="{{route('admin.tamu.show',$data->id)}}"
@@ -378,7 +475,6 @@ method="POST"
 style="display:inline">
 
 
-
 @csrf
 
 @method('DELETE')
@@ -407,6 +503,9 @@ onclick="return confirm('Hapus data?')">
 
 
 
+
+
+
 </tr>
 
 
@@ -418,7 +517,7 @@ onclick="return confirm('Hapus data?')">
 <tr>
 
 
-<td colspan="13"
+<td colspan="14"
 
 class="text-center text-muted">
 
@@ -444,6 +543,51 @@ Belum ada data tamu
 </table>
 
 
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+<!-- MODAL FOTO -->
+
+
+<div class="modal fade" id="fotoModal">
+
+
+<div class="modal-dialog modal-dialog-centered modal-lg">
+
+
+<div class="modal-content">
+
+
+<div class="modal-body text-center">
+
+
+<img
+
+id="gambarBesar"
+
+class="img-fluid rounded"
+
+style="max-height:600px;"
+
+>
+
+
+</div>
+
+
+</div>
+
+
 </div>
 
 
@@ -453,14 +597,42 @@ Belum ada data tamu
 
 
 
-</div>
+
+
+
+<script>
+
+
+function lihatFoto(url){
+
+
+document.getElementById('gambarBesar').src=url;
+
+
+
+let modal = new bootstrap.Modal(
+
+document.getElementById('fotoModal')
+
+);
+
+
+
+modal.show();
+
+
+}
+
+
+</script>
+
+
 
 
 
 
 
 <style>
-
 
 
 .page-header{
@@ -485,6 +657,7 @@ box-shadow:0 10px 30px #0001;
 
 
 
+
 .page-header h2{
 
 
@@ -497,6 +670,7 @@ color:#1265d8;
 
 
 
+
 .page-header p{
 
 
@@ -504,7 +678,6 @@ color:#64748b;
 
 
 }
-
 
 
 
@@ -528,7 +701,6 @@ box-shadow:0 10px 30px #0001;
 
 
 
-
 .form-control{
 
 
@@ -538,7 +710,6 @@ border-radius:12px;
 
 
 }
-
 
 
 
@@ -557,8 +728,6 @@ padding:12px 20px;
 
 
 }
-
-
 
 
 
@@ -616,6 +785,31 @@ white-space:nowrap;
 
 
 
+/* FOTO DOKUMENTASI */
+
+
+.foto-kegiatan{
+
+
+width:120px;
+
+height:80px;
+
+object-fit:cover;
+
+border-radius:12px;
+
+cursor:pointer;
+
+border:2px solid #e2e8f0;
+
+
+}
+
+
+
+
+
 .badge-status{
 
 
@@ -635,6 +829,7 @@ font-size:13px;
 
 
 
+
 .catatan{
 
 
@@ -649,6 +844,8 @@ border-radius:10px;
 
 
 
+
+
 .table tbody tr:hover{
 
 
@@ -656,7 +853,6 @@ background:#f8fbff;
 
 
 }
-
 
 
 </style>

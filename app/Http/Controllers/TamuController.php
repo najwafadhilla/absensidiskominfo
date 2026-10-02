@@ -9,11 +9,10 @@ use App\Models\Kunjungan;
 class TamuController extends Controller
 {
 
+
     public function store(Request $request)
     {
 
-
-        // VALIDASI FORM
 
         $request->validate([
 
@@ -25,64 +24,32 @@ class TamuController extends Controller
 
             'tujuan_bidang' => 'required',
 
-            'jabatan' => 'nullable',
-
-            'catatan' => 'nullable',
-
             'captcha' => 'required|captcha',
+
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
 
         ]);
 
 
 
+        // SIMPAN FOTO KEGIATAN
 
-        // CEGAH SUBMIT DATA YANG SAMA
-        // DALAM 5 MENIT TERAKHIR
-        // DENGAN BIDANG YANG SAMA
-
-
-        $cek = Kunjungan::where('nama_lengkap', $request->nama_lengkap)
-
-            ->where('no_hp', $request->no_hp)
-
-            ->where('tujuan_bidang', $request->tujuan_bidang)
-
-            ->whereDate(
-                'tanggal_kunjungan',
-                now()->format('Y-m-d')
-            )
-
-            ->where(
-                'jam_kedatangan',
-                '>=',
-                now()->subMinutes(5)->format('H:i:s')
-            )
-
-            ->first();
+        $foto = null;
 
 
+        if($request->hasFile('foto')){
 
-        if($cek){
 
-
-            return back()
-
-            ->withInput()
-
-            ->with(
-                'error',
-                'Data dengan bidang yang sama sudah dikirim. Silakan tunggu beberapa menit.'
-            );
+            $foto = $request
+                ->file('foto')
+                ->store('foto_tamu','public');
 
 
         }
 
 
 
-
-
         // SIMPAN DATA TAMU
-
 
         Kunjungan::create([
 
@@ -93,50 +60,37 @@ class TamuController extends Controller
             'jam_kedatangan' => now()->format('H:i:s'),
 
 
-
             'nama_lengkap' => $request->nama_lengkap,
-
 
 
             'instansi_asal' => $request->instansi_asal,
 
 
-
             'jabatan' => $request->jabatan,
-
 
 
             'status' => $request->status,
 
 
-
             'no_hp' => $request->no_hp,
 
 
-
-
-            // JIKA PILIH LAINNYA
-            // AMBIL INPUT MANUAL
-
-'keperluan' => $request->keperluan,
-
-
+            'keperluan' => $request->keperluan,
 
 
             'tujuan_bidang' => $request->tujuan_bidang,
 
 
-
             'bertemu_dengan' => $request->bertemu_dengan,
-
 
 
             'catatan' => $request->catatan,
 
 
+            'foto' => $foto,
+
+
         ]);
-
-
 
 
 
@@ -149,5 +103,6 @@ class TamuController extends Controller
 
 
     }
+
 
 }

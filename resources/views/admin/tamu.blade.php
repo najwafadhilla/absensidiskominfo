@@ -3,54 +3,46 @@
 
 @section('content')
 
+<h1 style="color:red">
+TES HALAMAN ADMIN
+</h1>
+
+
+
 
 
 <!-- HEADER -->
 
 <div class="topbar">
 
+    <div class="d-flex justify-content-between align-items-center">
 
-<div class="d-flex justify-content-between align-items-center">
+        <div>
 
+            <h3 class="fw-bold mb-1">
+                Data Tamu
+            </h3>
 
-<div>
+            <p class="text-muted mb-0">
+                Daftar seluruh kunjungan tamu
+            </p>
 
-<h3 class="fw-bold mb-1">
-
-Data Tamu
-
-</h3>
-
-
-<p class="text-muted mb-0">
-
-Daftar seluruh kunjungan tamu
-
-</p>
-
-
-</div>
+        </div>
 
 
 
-<a href="/tamu"
-class="btn btn-primary">
+        <a href="/tamu" class="btn btn-primary">
+
+            <i class="bi bi-globe me-2"></i>
+
+            Halaman Pengunjung
+
+        </a>
 
 
-<i class="bi bi-globe me-2"></i>
-
-Halaman Pengunjung
-
-
-</a>
-
+    </div>
 
 </div>
-
-
-</div>
-
-
 
 
 
@@ -60,22 +52,16 @@ Halaman Pengunjung
 
 <!-- FILTER -->
 
-
 <div class="card-box mb-4">
 
 
-
-<form method="GET"
-action="/admin/tamu">
-
+<form method="GET" action="/admin/tamu">
 
 
 <div class="row g-3">
 
 
-
 <div class="col-lg-6">
-
 
 <input type="text"
 
@@ -87,15 +73,12 @@ placeholder="Cari nama, instansi, keperluan..."
 
 value="{{request('search')}}">
 
-
 </div>
 
 
 
 
-
 <div class="col-lg-3">
-
 
 <input type="date"
 
@@ -103,13 +86,9 @@ name="tanggal"
 
 class="form-control form-control-lg"
 
-value="{{request('tanggal')}}">
-
+value="{{request('tanggal)}}">
 
 </div>
-
-
-
 
 
 
@@ -122,7 +101,6 @@ value="{{request('tanggal')}}">
 
 <i class="bi bi-search me-2"></i>
 
-
 Cari
 
 
@@ -133,13 +111,10 @@ Cari
 
 
 
-
 </div>
 
 
-
 </form>
-
 
 
 
@@ -148,7 +123,6 @@ Cari
 Menampilkan {{$kunjungans->count()}} data tamu
 
 </p>
-
 
 
 </div>
@@ -167,13 +141,10 @@ Menampilkan {{$kunjungans->count()}} data tamu
 <div class="card-box">
 
 
-
 <div class="table-responsive">
 
 
-
 <table class="table align-middle">
-
 
 
 <thead>
@@ -183,73 +154,61 @@ Menampilkan {{$kunjungans->count()}} data tamu
 
 
 <th width="50">
-
 NO
-
 </th>
 
 
 <th>
+FOTO
+</th>
 
+
+<th>
 NAMA LENGKAP
-
 </th>
 
 
-
 <th>
-
 INSTANSI
-
 </th>
 
 
 <th>
 JABATAN
 </th>
-<th>
 
+
+<th>
 STATUS
-
 </th>
 
 
-
 <th>
-
 KEPERLUAN
-
 </th>
 
 
-
 <th>
-
 TUJUAN
-
 </th>
 
 
-
 <th>
-
 TANGGAL
-
 </th>
-
 
 
 <th>
-
 JAM
-
 </th>
+
 
 <th>
 CATATAN
 </th>
-</tr>
 
+
+</tr>
 
 
 </thead>
@@ -258,13 +217,10 @@ CATATAN
 
 
 
-
 <tbody>
 
 
-
 @forelse($kunjungans as $index=>$data)
-
 
 
 <tr>
@@ -280,9 +236,53 @@ CATATAN
 
 
 
+<!-- FOTO -->
 
 <td>
 
+
+@if($data->foto)
+
+
+<img
+
+src="{{asset('storage/'.$data->foto)}}"
+
+width="60"
+
+height="60"
+
+style="
+object-fit:cover;
+border-radius:50%;
+cursor:pointer;
+border:3px solid #e5e7eb;
+"
+
+onclick="lihatFoto('{{asset('storage/'.$data->foto)}}')"
+
+
+>
+
+
+@else
+
+
+<i class="bi bi-person-circle text-secondary fs-2"></i>
+
+
+@endif
+
+
+</td>
+
+
+
+
+
+<!-- NAMA -->
+
+<td>
 
 <b>
 
@@ -297,20 +297,20 @@ CATATAN
 
 
 
-
-
 <td>
 
-{{$data->instansi_asal}}
+{{$data->instansi_asal ?? '-'}}
 
 </td>
+
+
+
+
 <td>
 
 {{$data->jabatan ?? '-'}}
 
 </td>
-
-
 
 
 
@@ -334,15 +334,11 @@ CATATAN
 
 
 
-
-
 <td>
 
 {{$data->keperluan}}
 
 </td>
-
-
 
 
 
@@ -358,15 +354,11 @@ CATATAN
 
 
 
-
-
 <td>
 
 {{date('d M Y',strtotime($data->tanggal_kunjungan))}}
 
 </td>
-
-
 
 
 
@@ -378,9 +370,15 @@ CATATAN
 
 </td>
 
+
+
+
+
 <td>
 
+
 @if($data->catatan)
+
 
 <span class="badge bg-light text-dark">
 
@@ -388,7 +386,9 @@ CATATAN
 
 </span>
 
+
 @else
+
 
 <span class="text-muted">
 
@@ -396,7 +396,9 @@ CATATAN
 
 </span>
 
+
 @endif
+
 
 </td>
 
@@ -411,11 +413,11 @@ CATATAN
 @empty
 
 
-
 <tr>
 
 
-<td colspan="10"
+<td colspan="11"
+
 class="text-center text-muted py-4">
 
 
@@ -428,8 +430,8 @@ Belum ada data tamu
 </tr>
 
 
-
 @endforelse
+
 
 
 
@@ -437,19 +439,90 @@ Belum ada data tamu
 </tbody>
 
 
-
 </table>
 
 
+</div>
+
 
 </div>
 
 
 
+
+
+
+
+
+
+<!-- MODAL FOTO BESAR -->
+
+
+<div class="modal fade" id="fotoModal" tabindex="-1">
+
+
+<div class="modal-dialog modal-dialog-centered">
+
+
+<div class="modal-content">
+
+
+<div class="modal-body text-center p-4">
+
+
+<img
+
+id="gambarBesar"
+
+src=""
+
+class="img-fluid rounded"
+
+style="max-height:500px;"
+
+>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
 </div>
 
 
 
+
+
+
+
+<script>
+
+
+function lihatFoto(url){
+
+
+document.getElementById('gambarBesar').src=url;
+
+
+let modal = new bootstrap.Modal(
+
+document.getElementById('fotoModal')
+
+);
+
+
+modal.show();
+
+
+}
+
+
+</script>
 
 
 
